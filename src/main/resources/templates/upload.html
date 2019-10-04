@@ -7,5 +7,11 @@
 <body>
     <h1>File upload</h1>
     <p>This is file upload page</p>
+    <form method="POST" enctype="multipart/form-data" action="/api/v1/upload">
+        <label for="file">File:</label>
+        <input type="file" name="file" id="file"/>
+        <br/>
+        <input type="submit" value="Upload"/>
+    </form>
 </body>
 </html>
