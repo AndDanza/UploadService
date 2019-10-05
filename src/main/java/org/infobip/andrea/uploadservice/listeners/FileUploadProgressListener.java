@@ -53,14 +53,17 @@ public class FileUploadProgressListener implements ProgressListener
     public void setSession(final HttpServletRequest request)
     {
         this.session = request.getSession();
-        List<FileUploadProgress> uploads = (List<FileUploadProgress>) this.session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
-        if (uploads == null)
+        if (this.session != null)
         {
-            uploads = new ArrayList<>();
-            this.session.setAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE, uploads);
-        }
+            List<FileUploadProgress> uploads = (List<FileUploadProgress>) this.session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+            if (uploads == null)
+            {
+                uploads = new ArrayList<>();
+                this.session.setAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE, uploads);
+            }
 
-        this.filename = request.getHeader("X-Upload-File");
-        uploads.add(new FileUploadProgress(this.filename));
+            this.filename = request.getHeader("X-Upload-File");
+            uploads.add(new FileUploadProgress(this.filename));
+        }
     }
 }

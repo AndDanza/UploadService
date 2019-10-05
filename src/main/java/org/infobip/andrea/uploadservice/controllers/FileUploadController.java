@@ -9,33 +9,39 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgressResponse;
+import org.infobip.andrea.uploadservice.services.StorageService;
 import org.infobip.andrea.uploadservice.utils.Constants;
 import org.infobip.andrea.uploadservice.utils.UploadStatistics;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 public class FileUploadController
 {
+    private final StorageService storageService;
+
+    public FileUploadController(final StorageService storageService)
+    {
+        this.storageService = storageService;
+    }
+
     @GetMapping(value = "/upload")
     public ModelAndView getFileUpload()
     {
         return new ModelAndView("upload");
     }
 
-    @GetMapping(value = "/success")
-    public ModelAndView getSuccessPage()
-    {
-        return new ModelAndView("success");
-    }
-
     @PostMapping(value = "/api/v1/upload")
-    public ResponseEntity postFileUpload(final HttpServletRequest request)
+    public ResponseEntity postFileUpload(final HttpServletRequest request, @RequestParam final MultipartFile file)
     {
-        String path = StringUtils.join("http://" + request.getServerName() + ":" + request.getServerPort() + "/success");
+        String path = StringUtils.join("http://" + request.getServerName() + ":" + request.getServerPort());
+        path += this.storageService.storeFile(file) ? "/success" : "/error";
+
         return ResponseEntity.ok(path);
     }
 
@@ -60,7 +66,7 @@ public class FileUploadController
     @GetMapping(value = "/api/v1/upload/duration")
     public ResponseEntity getFileUploadDuration(final HttpServletRequest request)
     {
-        final String response_format = "upload_duration{id=\"%s\"} %d";
+        final String response_format = "upload_duration{id=\"%s-%d\"} %d";
         String response = "No data";
 
         final HttpSession session = request.getSession();
@@ -69,7 +75,7 @@ public class FileUploadController
             final List<FileUploadProgress> uploads = UploadStatistics.getUploads();
             if (uploads != null)
             {
-                response = uploads.stream().map(uploadProgress -> String.format(response_format, uploadProgress.getFilename(), uploadProgress.getDuration())).collect(Collectors.joining(", \n"));
+                response = uploads.stream().map(uploadProgress -> String.format(response_format, uploadProgress.getFilename(), uploadProgress.getUploadStarted().getTime(), uploadProgress.getDuration())).collect(Collectors.joining(", \n"));
             }
         }
 

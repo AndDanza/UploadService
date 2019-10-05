@@ -69,6 +69,11 @@ public class FileUploadProgress implements Serializable
         this.filename = filename;
     }
 
+    public Date getUploadStarted()
+    {
+        return uploadStarted;
+    }
+
     public Date getUploadEnded()
     {
         return this.uploadEnded;
