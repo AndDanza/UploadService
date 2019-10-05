@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>FileUpload</title>
@@ -7,7 +7,7 @@
 <body>
     <h1>File upload</h1>
     <p>This is file upload page</p>
-    <form method="POST" enctype="multipart/form-data" action="/api/v1/upload">
+    <form id="form" method="POST" enctype="multipart/form-data" action="/api/v1/upload">
         <label for="file">File:</label>
         <input type="file" name="file" id="file"/>
         <br/>
