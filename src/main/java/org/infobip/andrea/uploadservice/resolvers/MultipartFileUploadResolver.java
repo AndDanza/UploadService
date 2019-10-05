@@ -23,7 +23,7 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
         final FileUpload fileUpload = prepareFileUpload(encoding);
 
         FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
-        uploadProgressListener.setSession(request);
+        uploadProgressListener.initializeProgressListener(request);
         fileUpload.setProgressListener(uploadProgressListener);
 
         MultipartParsingResult multipartParsingResult = null;

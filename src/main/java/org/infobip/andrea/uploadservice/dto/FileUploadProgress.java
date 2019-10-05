@@ -3,52 +3,47 @@ package org.infobip.andrea.uploadservice.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class FileUploadProgress implements Serializable
 {
     private static final long serialVersionUID = 7906730624000106797L;
 
-    private long bytesRead;
-    private long contentLength;
-    private int items;
-    private String filename;
+    private long uploaded;
+    private long size;
+    private String id;
     private Date uploadStarted;
     private Date uploadEnded;
 
-    public FileUploadProgress(String filename)
+    public FileUploadProgress(String id)
     {
-        this.filename = filename;
+        this.id = id;
     }
 
-    public long getBytesRead()
+    public long getUploaded()
     {
-        return this.bytesRead;
+        return this.uploaded;
     }
 
-    public void setBytesRead(final long bytesRead)
+    public void setUploaded(final long uploaded)
     {
-        this.bytesRead = bytesRead;
+        this.uploaded = uploaded;
     }
 
-    public long getContentLength()
+    public long getSize()
     {
-        return this.contentLength;
+        return this.size;
     }
 
-    public void setContentLength(final long contentLength)
+    public void setSize(final long size)
     {
-        this.contentLength = contentLength;
+        this.size = size;
     }
 
-    public int getItems()
-    {
-        return this.items;
-    }
-
-    public void setItems(final int items)
-    {
-        this.items = items;
-    }
-
+    @JsonIgnore
     public void setUploadStarted(final Date uploadStarted)
     {
         this.uploadStarted = uploadStarted;
@@ -59,26 +54,36 @@ public class FileUploadProgress implements Serializable
         this.uploadEnded = uploadEnded;
     }
 
-    public String getFilename()
+    @JsonIgnore
+    public String getId()
     {
-        return this.filename;
+        return this.id;
     }
 
-    public void setFilename(final String filename)
+    @JsonProperty(value = "id")
+    public String getIdWithTimestamp()
     {
-        this.filename = filename;
+        return StringUtils.join(this.id, "-", this.uploadStarted.getTime());
     }
 
+    public void setId(final String id)
+    {
+        this.id = id;
+    }
+
+    @JsonIgnore
     public Date getUploadStarted()
     {
         return uploadStarted;
     }
 
+    @JsonIgnore
     public Date getUploadEnded()
     {
         return this.uploadEnded;
     }
 
+    @JsonIgnore
     public long getDuration()
     {
         long duration = 0L;

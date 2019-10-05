@@ -27,7 +27,7 @@ public class FileUploadProgressListener implements ProgressListener
             final List<FileUploadProgress> uploads = (List<FileUploadProgress>) this.session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
             if (uploads != null)
             {
-                final Optional<FileUploadProgress> uploadProgressOpt = uploads.stream().filter(progress -> StringUtils.equals(this.filename, progress.getFilename())).findFirst();
+                final Optional<FileUploadProgress> uploadProgressOpt = uploads.stream().filter(progress -> StringUtils.equals(this.filename, progress.getId())).findFirst();
                 if (uploadProgressOpt.isPresent())
                 {
                     final FileUploadProgress uploadProgress = uploadProgressOpt.get();
@@ -42,15 +42,14 @@ public class FileUploadProgressListener implements ProgressListener
                         uploads.remove(uploadProgress);
                         UploadStatistics.addUpload(uploadProgress);
                     }
-                    uploadProgress.setBytesRead(l);
-                    uploadProgress.setContentLength(l1);
-                    uploadProgress.setItems(i);
+                    uploadProgress.setUploaded(l);
+                    uploadProgress.setSize(l1);
                 }
             }
         }
     }
 
-    public void setSession(final HttpServletRequest request)
+    public void initializeProgressListener(final HttpServletRequest request)
     {
         this.session = request.getSession();
         if (this.session != null)

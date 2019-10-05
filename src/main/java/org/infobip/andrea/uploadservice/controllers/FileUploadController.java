@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.infobip.andrea.uploadservice.dto.FileUploadDuration;
+import org.infobip.andrea.uploadservice.dto.FileUploadDurationResponse;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgressResponse;
 import org.infobip.andrea.uploadservice.services.StorageService;
@@ -66,19 +68,22 @@ public class FileUploadController
     @GetMapping(value = "/api/v1/upload/duration")
     public ResponseEntity getFileUploadDuration(final HttpServletRequest request)
     {
-        final String response_format = "upload_duration{id=\"%s-%d\"} %d";
-        String response = "No data";
+        final FileUploadDurationResponse response = new FileUploadDurationResponse();
 
         final HttpSession session = request.getSession();
         if (session != null)
         {
             final List<FileUploadProgress> uploads = UploadStatistics.getUploads();
-            if (uploads != null)
-            {
-                response = uploads.stream().map(uploadProgress -> String.format(response_format, uploadProgress.getFilename(), uploadProgress.getUploadStarted().getTime(), uploadProgress.getDuration())).collect(Collectors.joining(", \n"));
-            }
+            final List<FileUploadDuration> uploadDurations = uploads.stream().map(this::createUploadDurationInfo).collect(Collectors.toList());
+            
+            response.setUploadDurations(uploadDurations);
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    private FileUploadDuration createUploadDurationInfo(final FileUploadProgress progress)
+    {
+        return new FileUploadDuration(progress.getIdWithTimestamp(), progress.getDuration());
     }
 }
