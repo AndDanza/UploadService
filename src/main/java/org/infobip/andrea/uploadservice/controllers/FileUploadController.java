@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgressResponse;
 import org.infobip.andrea.uploadservice.utils.Constants;
@@ -25,10 +26,17 @@ public class FileUploadController
         return new ModelAndView("upload");
     }
 
-    @PostMapping(value = "/api/v1/upload")
-    public ModelAndView postFileUpload()
+    @GetMapping(value = "/success")
+    public ModelAndView getSuccessPage()
     {
-        return new ModelAndView("redirect:/upload");
+        return new ModelAndView("success");
+    }
+
+    @PostMapping(value = "/api/v1/upload")
+    public ResponseEntity postFileUpload(final HttpServletRequest request)
+    {
+        String path = StringUtils.join("http://" + request.getServerName() + ":" + request.getServerPort() + "/success");
+        return ResponseEntity.ok(path);
     }
 
     @GetMapping(value = "/api/v1/upload/progress")

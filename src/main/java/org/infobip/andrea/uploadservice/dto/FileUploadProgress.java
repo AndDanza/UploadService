@@ -14,8 +14,9 @@ public class FileUploadProgress implements Serializable
     private Date uploadStarted;
     private Date uploadEnded;
 
-    public FileUploadProgress()
+    public FileUploadProgress(String filename)
     {
+        this.filename = filename;
     }
 
     public long getBytesRead()
