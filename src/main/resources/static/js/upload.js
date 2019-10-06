@@ -18,6 +18,9 @@ $(document).ready(function () {
             },
             success: function(response){
                 window.location.replace(response);
+            },
+            error: function(){
+                window.location.replace(window.document.location.origin);
             }
         });
     });

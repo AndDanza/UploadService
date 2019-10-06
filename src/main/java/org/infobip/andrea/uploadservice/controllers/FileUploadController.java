@@ -17,6 +17,7 @@ import org.infobip.andrea.uploadservice.utils.Constants;
 import org.infobip.andrea.uploadservice.utils.MapUtils;
 import org.infobip.andrea.uploadservice.utils.UploadStatistics;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,10 +42,10 @@ public class FileUploadController
     }
 
     @PostMapping(value = "/api/v1/upload")
-    public ResponseEntity postFileUpload(final HttpServletRequest request, @RequestParam final MultipartFile file)
+    public ResponseEntity postFileUpload(final HttpServletRequest request, @RequestParam(required=false) final MultipartFile file)
     {
-        String path = StringUtils.join("http://" + request.getServerName() + ":" + request.getServerPort());
-        path += this.storageService.storeFile(file) ? "/success" : "/error";
+        final String landingPage = file != null && this.storageService.storeFile(file) ? "/success" : "/error";
+        final String path = StringUtils.join("http://", request.getServerName(), ":", request.getServerPort(), landingPage);
 
         return ResponseEntity.ok(path);
     }

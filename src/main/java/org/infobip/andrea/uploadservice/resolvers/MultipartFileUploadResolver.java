@@ -1,5 +1,6 @@
 package org.infobip.andrea.uploadservice.resolvers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,26 +30,28 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
         final String filename = request.getHeader(Constants.X_UPLOAD_FILE);
         MultipartParsingResult multipartParsingResult = null;
 
-        if (uploads != null && uploads.containsKey(filename))
-        {
-            //TODO prekini da ne vrišti server
-        }
-
         final String encoding = determineEncoding(request);
         final FileUpload fileUpload = prepareFileUpload(encoding);
 
-        final FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
-        uploadProgressListener.initializeProgressListener(request);
-        fileUpload.setProgressListener(uploadProgressListener);
+        if (uploads == null || (uploads != null && !uploads.containsKey(filename)))
+        {
+            final FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
+            uploadProgressListener.initializeProgressListener(request);
+            fileUpload.setProgressListener(uploadProgressListener);
 
-        try
-        {
-            final List<FileItem> fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);
-            multipartParsingResult = parseFileItems(fileItems, encoding);
+            try
+            {
+                final List<FileItem> fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);
+                multipartParsingResult = parseFileItems(fileItems, encoding);
+            }
+            catch (final FileUploadException e)
+            {
+                LOG.error(filename + " could not be processed", e);
+            }
         }
-        catch (final FileUploadException e)
+        else
         {
-            LOG.error(filename + " could not be processed", e);
+            multipartParsingResult = parseFileItems(Collections.emptyList(), encoding);
         }
 
         return multipartParsingResult;
