@@ -75,7 +75,7 @@ public class FileUploadController
         {
             final List<FileUploadProgress> uploads = UploadStatistics.getUploads();
             final List<FileUploadDuration> uploadDurations = uploads.stream().map(this::createUploadDurationInfo).collect(Collectors.toList());
-            
+
             response.setUploadDurations(uploadDurations);
         }
 

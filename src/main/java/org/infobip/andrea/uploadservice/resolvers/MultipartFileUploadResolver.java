@@ -8,28 +8,44 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.listeners.FileUploadProgressListener;
+import org.infobip.andrea.uploadservice.utils.Constants;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Component
 public class MultipartFileUploadResolver extends CommonsMultipartResolver
 {
     @Override
-    protected MultipartParsingResult parseRequest(final HttpServletRequest request) throws MultipartException
+    protected MultipartParsingResult parseRequest(final HttpServletRequest request)
     {
+        boolean fileAlreadyUploading = false;
+        final List<FileUploadProgress> uploads = (List<FileUploadProgress>) request.getSession().getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+
+        if (uploads != null)
+        {
+            final String filename = request.getHeader("X-Upload-File");
+            fileAlreadyUploading = uploads.stream().anyMatch(progress -> StringUtils.equals(filename, progress.getId()));
+        }
+
+        MultipartParsingResult multipartParsingResult = null;
+        if (fileAlreadyUploading)
+        {
+            //TODO prekini da ne vrišti server
+        }
+
         final String encoding = determineEncoding(request);
         final FileUpload fileUpload = prepareFileUpload(encoding);
 
-        FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
+        final FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
         uploadProgressListener.initializeProgressListener(request);
         fileUpload.setProgressListener(uploadProgressListener);
 
-        MultipartParsingResult multipartParsingResult = null;
         try
         {
-            List<FileItem> fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);
+            final List<FileItem> fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);
             multipartParsingResult = parseFileItems(fileItems, encoding);
         }
         catch (final FileUploadException e)

@@ -8,7 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ErrorPageController
 {
     @GetMapping(value = "/error")
-    public ModelAndView getSuccessPage()
+    public ModelAndView getErrorPage()
     {
         return new ModelAndView("error");
     }

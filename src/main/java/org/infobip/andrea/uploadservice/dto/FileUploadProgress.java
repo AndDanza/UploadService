@@ -18,7 +18,7 @@ public class FileUploadProgress implements Serializable
     private Date uploadStarted;
     private Date uploadEnded;
 
-    public FileUploadProgress(String id)
+    public FileUploadProgress(final String id)
     {
         this.id = id;
     }
@@ -74,7 +74,7 @@ public class FileUploadProgress implements Serializable
     @JsonIgnore
     public Date getUploadStarted()
     {
-        return uploadStarted;
+        return this.uploadStarted;
     }
 
     @JsonIgnore
