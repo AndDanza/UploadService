@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import javax.annotation.PostConstruct;
 
 import org.infobip.andrea.uploadservice.services.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class StorageServiceImpl implements StorageService
 {
+    private static final Logger LOG = LoggerFactory.getLogger(StorageServiceImpl.class);
+
     @Value("${uploadservice.upload.location}")
     private String uploadPath;
 
@@ -41,12 +45,13 @@ public class StorageServiceImpl implements StorageService
             {
                 final Path filePath = Paths.get(this.uploadPath + "/" + file.getOriginalFilename());
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                
+
                 isStored = true;
             }
             catch (final IOException e)
             {
-                isStored = false;//TODO log exception
+                isStored = false;
+                LOG.warn(file.getOriginalFilename() + " could not be stored", e);
             }
         }
 

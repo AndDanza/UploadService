@@ -12,21 +12,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.listeners.FileUploadProgressListener;
 import org.infobip.andrea.uploadservice.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Component
 public class MultipartFileUploadResolver extends CommonsMultipartResolver
 {
+    private static final Logger LOG = LoggerFactory.getLogger(MultipartFileUploadResolver.class);
+
     @Override
     protected MultipartParsingResult parseRequest(final HttpServletRequest request)
     {
         boolean fileAlreadyUploading = false;
         final List<FileUploadProgress> uploads = (List<FileUploadProgress>) request.getSession().getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+        final String filename = request.getHeader("X-Upload-File");
 
         if (uploads != null)
         {
-            final String filename = request.getHeader("X-Upload-File");
             fileAlreadyUploading = uploads.stream().anyMatch(progress -> StringUtils.equals(filename, progress.getId()));
         }
 
@@ -50,7 +54,7 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
         }
         catch (final FileUploadException e)
         {
-            e.printStackTrace(); //TODO log exception
+            LOG.error(filename + " could not be processed", e);
         }
 
         return multipartParsingResult;
