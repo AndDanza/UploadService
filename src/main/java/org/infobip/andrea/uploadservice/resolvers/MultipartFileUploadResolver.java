@@ -9,7 +9,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.listeners.FileUploadProgressListener;
 import org.infobip.andrea.uploadservice.utils.Constants;
@@ -27,7 +26,7 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
     protected MultipartParsingResult parseRequest(final HttpServletRequest request)
     {
         final Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) request.getSession().getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
-        final String filename = request.getHeader("X-Upload-File");
+        final String filename = request.getHeader(Constants.X_UPLOAD_FILE);
         MultipartParsingResult multipartParsingResult = null;
 
         if (uploads != null && uploads.containsKey(filename))

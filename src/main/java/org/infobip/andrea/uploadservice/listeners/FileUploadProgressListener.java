@@ -55,7 +55,7 @@ public class FileUploadProgressListener implements ProgressListener
                 this.session.setAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE, uploads);
             }
 
-            this.filename = request.getHeader("X-Upload-File");
+            this.filename = request.getHeader(Constants.X_UPLOAD_FILE);
             uploads.put(this.filename, new FileUploadProgress(this.filename));
         }
     }
