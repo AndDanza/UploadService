@@ -1,6 +1,7 @@
 package org.infobip.andrea.uploadservice.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgressResponse;
 import org.infobip.andrea.uploadservice.services.StorageService;
 import org.infobip.andrea.uploadservice.utils.Constants;
+import org.infobip.andrea.uploadservice.utils.MapUtils;
 import org.infobip.andrea.uploadservice.utils.UploadStatistics;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,10 +57,10 @@ public class FileUploadController
         final HttpSession session = request.getSession();
         if (session != null)
         {
-            final List<FileUploadProgress> uploads = (List<FileUploadProgress>) session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+            final Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
             if (uploads != null)
             {
-                response.setUploads(uploads);
+                response.setUploads(MapUtils.mapValuesToList(uploads));
             }
         }
 

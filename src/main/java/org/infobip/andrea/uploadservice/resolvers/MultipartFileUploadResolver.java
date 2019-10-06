@@ -1,6 +1,7 @@
 package org.infobip.andrea.uploadservice.resolvers;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,17 +26,11 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
     @Override
     protected MultipartParsingResult parseRequest(final HttpServletRequest request)
     {
-        boolean fileAlreadyUploading = false;
-        final List<FileUploadProgress> uploads = (List<FileUploadProgress>) request.getSession().getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+        final Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) request.getSession().getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
         final String filename = request.getHeader("X-Upload-File");
-
-        if (uploads != null)
-        {
-            fileAlreadyUploading = uploads.stream().anyMatch(progress -> StringUtils.equals(filename, progress.getId()));
-        }
-
         MultipartParsingResult multipartParsingResult = null;
-        if (fileAlreadyUploading)
+
+        if (uploads != null && uploads.containsKey(filename))
         {
             //TODO prekini da ne vrišti server
         }
