@@ -17,7 +17,6 @@ import org.infobip.andrea.uploadservice.utils.Constants;
 import org.infobip.andrea.uploadservice.utils.MapUtils;
 import org.infobip.andrea.uploadservice.utils.UploadStatistics;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
