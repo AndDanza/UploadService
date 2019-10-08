@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.ProgressListener;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
+import org.infobip.andrea.uploadservice.services.FileUploadStatisticsService;
 import org.infobip.andrea.uploadservice.utils.Constants;
 import org.infobip.andrea.uploadservice.utils.UploadStatistics;
 
@@ -16,13 +17,14 @@ public class FileUploadProgressListener implements ProgressListener
 {
     private HttpSession session;
     private String filename;
+    private FileUploadStatisticsService fileUploadStatisticsService;
 
     @Override
     public void update(final long l, final long l1, final int i)
     {
-        if (this.session != null)
+        if (this.session != null && this.fileUploadStatisticsService != null)
         {
-            final Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) this.session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+            final Map<String, FileUploadProgress> uploads = this.fileUploadStatisticsService.getFileUploadsProgressForSession(this.session);
             if (uploads != null && uploads.containsKey(this.filename))
             {
                 final FileUploadProgress uploadProgress = uploads.get(this.filename);
@@ -43,12 +45,13 @@ public class FileUploadProgressListener implements ProgressListener
         }
     }
 
-    public void initializeProgressListener(final HttpServletRequest request)
+    public void initializeProgressListener(final HttpServletRequest request, final FileUploadStatisticsService fileUploadStatisticsService)
     {
+        this.fileUploadStatisticsService = fileUploadStatisticsService;
         this.session = request.getSession();
-        if (this.session != null)
+        if (this.session != null && this.fileUploadStatisticsService != null)
         {
-            Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) this.session.getAttribute(Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
+            Map<String, FileUploadProgress> uploads = this.fileUploadStatisticsService.getFileUploadsProgressForSession(this.session);
             if (uploads == null)
             {
                 uploads = new HashMap<>();
