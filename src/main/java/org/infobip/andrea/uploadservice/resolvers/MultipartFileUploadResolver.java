@@ -14,8 +14,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 import org.infobip.andrea.uploadservice.listeners.FileUploadProgressListener;
-import org.infobip.andrea.uploadservice.services.FileUploadStatisticsService;
+import org.infobip.andrea.uploadservice.services.FileUploadFacade;
 import org.infobip.andrea.uploadservice.utils.Constants;
+import org.infobip.andrea.uploadservice.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,11 +33,11 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
     @Value("${uploadservice.upload.max-size}")
     private String fileMaxSize;
 
-    private final FileUploadStatisticsService fileUploadStatisticsService;
+    private final FileUploadFacade fileUploadFacade;
 
-    public MultipartFileUploadResolver(final FileUploadStatisticsService fileUploadStatisticsService)
+    public MultipartFileUploadResolver(final FileUploadFacade fileUploadFacade)
     {
-        this.fileUploadStatisticsService = fileUploadStatisticsService;
+        this.fileUploadFacade = fileUploadFacade;
     }
 
     @PostConstruct
@@ -60,17 +61,17 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
     @Override
     protected MultipartParsingResult parseRequest(final HttpServletRequest request)
     {
-        final Map<String, FileUploadProgress> uploads = this.fileUploadStatisticsService.getFileUploadsProgressForSession(request.getSession());
+        final Map<String, FileUploadProgress> uploads = (Map<String, FileUploadProgress>) RequestUtils.getFileUploadsProgressForSession(request.getSession(), Constants.FILE_UPLOAD_PROGRESS_ATTRIBUTE);
         final String filename = request.getHeader(Constants.X_UPLOAD_FILE);
         MultipartParsingResult multipartParsingResult = null;
+        final String encoding = determineEncoding(request);
 
         if (uploads == null || (uploads != null && StringUtils.isNotEmpty(filename) && !uploads.containsKey(filename)))
         {
-            final String encoding = determineEncoding(request);
             final FileUpload fileUpload = prepareFileUpload(encoding);
 
             final FileUploadProgressListener uploadProgressListener = new FileUploadProgressListener();
-            uploadProgressListener.initializeProgressListener(request, fileUploadStatisticsService);
+            uploadProgressListener.initializeProgressListener(request, fileUploadFacade);
             fileUpload.setProgressListener(uploadProgressListener);
 
             try
@@ -86,7 +87,7 @@ public class MultipartFileUploadResolver extends CommonsMultipartResolver
 
         if (multipartParsingResult == null)
         {
-            multipartParsingResult = parseFileItems(Collections.emptyList(), null);
+            multipartParsingResult = parseFileItems(Collections.emptyList(), encoding);
         }
 
         return multipartParsingResult;

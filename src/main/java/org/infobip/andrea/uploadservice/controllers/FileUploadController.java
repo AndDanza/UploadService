@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.infobip.andrea.uploadservice.dto.FileUploadDurationResponse;
 import org.infobip.andrea.uploadservice.dto.FileUploadProgressResponse;
-import org.infobip.andrea.uploadservice.services.FileUploadStatisticsService;
+import org.infobip.andrea.uploadservice.services.FileUploadFacade;
 import org.infobip.andrea.uploadservice.services.StorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +19,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class FileUploadController
 {
     private final StorageService storageService;
-    private final FileUploadStatisticsService fileUploadStatisticsService;
+    private final FileUploadFacade fileUploadFacade;
 
-    public FileUploadController(final StorageService storageService, final FileUploadStatisticsService fileUploadStatisticsService)
+    public FileUploadController(final StorageService storageService, final FileUploadFacade fileUploadFacade)
     {
         this.storageService = storageService;
-        this.fileUploadStatisticsService = fileUploadStatisticsService;
+        this.fileUploadFacade = fileUploadFacade;
     }
 
     @GetMapping(value = "/upload")
@@ -45,7 +45,7 @@ public class FileUploadController
     @GetMapping(value = "/api/v1/upload/progress")
     public ResponseEntity getFileUploadProgress(final HttpServletRequest request)
     {
-        final FileUploadProgressResponse response = this.fileUploadStatisticsService.getFileUploadsProgressResponse(request.getSession());
+        final FileUploadProgressResponse response = this.fileUploadFacade.getFileUploadsProgressResponse(request.getSession());
 
         return ResponseEntity.ok(response);
     }
@@ -53,7 +53,7 @@ public class FileUploadController
     @GetMapping(value = "/api/v1/upload/duration")
     public ResponseEntity getFileUploadDuration()
     {
-        final FileUploadDurationResponse response = this.fileUploadStatisticsService.getAllFileUploadsDurationResponse();
+        final FileUploadDurationResponse response = this.fileUploadFacade.getAllFileUploadsDurationResponse();
 
         return ResponseEntity.ok(response);
     }

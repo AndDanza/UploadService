@@ -8,6 +8,10 @@ import org.infobip.andrea.uploadservice.dto.FileUploadProgress;
 
 public class MapUtils
 {
+    private MapUtils()  //SONAR
+    {
+    }
+
     public static List<FileUploadProgress> mapValuesToList(final Map<String, FileUploadProgress> uploads)
     {
         return new ArrayList<>(uploads.values());
